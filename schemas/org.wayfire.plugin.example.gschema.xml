@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.example" path="/org/wayfire/plugin/example/">
+    <key name="string-opt" type="s">
+      <default>'this is a string.'</default>
+      <summary>String Option</summary>
+    </key>
+    <key name="str-list-opt" type="s">
+      <default>'two'</default>
+      <summary>String List Option</summary>
+    </key>
+    <key name="int-opt" type="i">
+      <default>2</default>
+      <summary>Int Option</summary>
+    </key>
+    <key name="int-list-opt" type="i">
+      <default>2</default>
+      <summary>Int List Option</summary>
+      <range min="0" max="3"/>
+    </key>
+    <key name="double-opt" type="d">
+      <default>4.5</default>
+      <summary>Double Option</summary>
+    </key>
+    <key name="key-opt" type="s">
+      <default>'&lt;Super&gt;&lt;Alt&gt;t'</default>
+      <summary>Key Option</summary>
+    </key>
+    <key name="bool-opt" type="b">
+      <default>true</default>
+      <summary>Bool Option</summary>
+    </key>
+    <key name="button-opt" type="s">
+      <default>'&lt;Super&gt;Button1'</default>
+      <summary>Button Option</summary>
+    </key>
+    <key name="color-opt" type="(dddd)">
+      <default>(0.1,0.3,0.7,1.0)</default>
+      <summary>Color Option</summary>
+    </key>
+  </schema>
+</schemalist>

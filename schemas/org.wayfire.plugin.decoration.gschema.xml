@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.decoration" path="/org/wayfire/plugin/decoration/">
+    <key name="font" type="s">
+      <default>'serif'</default>
+      <summary>Font</summary>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.fisheye" path="/org/wayfire/plugin/fisheye/">
+    <key name="toggle" type="s">
+      <default>'&lt;super&gt; KEY_F'</default>
+      <summary>Toggle</summary>
+    </key>
+    <key name="radius" type="i">
+      <default>300</default>
+      <summary>Radius</summary>
+      <range min="1"/>
+    </key>
+    <key name="zoom" type="d">
+      <default>7.0</default>
+      <summary>Zoom</summary>
+      <range min="1.0" max="20.0"/>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.move" path="/org/wayfire/plugin/move/">
+    <key name="activate" type="s">
+      <default>'&lt;super&gt; BTN_LEFT'</default>
+      <summary>Activate</summary>
+    </key>
+    <key name="enable-snap" type="b">
+      <default>true</default>
+      <summary>Snap</summary>
+    </key>
+    <key name="snap-threshold" type="i">
+      <default>2</default>
+      <summary>Snap Threshold</summary>
+    </key>
+    <key name="enable-snap-off" type="b">
+      <default>true</default>
+      <summary>Snap Off</summary>
+    </key>
+    <key name="snap-off-threshold" type="i">
+      <default>0</default>
+      <summary>Snap Off Threshold</summary>
+    </key>
+  </schema>
+</schemalist>

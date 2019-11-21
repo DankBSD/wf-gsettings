@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.grid" path="/org/wayfire/plugin/grid/">
+    <key name="duration" type="i">
+      <default>300</default>
+      <summary>Duration</summary>
+    </key>
+    <key name="type" type="s">
+      <default>'simple'</default>
+      <summary>Type</summary>
+    </key>
+    <key name="slot-bl" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP1'</default>
+      <summary>Bottom Left</summary>
+    </key>
+    <key name="slot-b" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP2'</default>
+      <summary>Bottom</summary>
+    </key>
+    <key name="slot-br" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP3'</default>
+      <summary>Bottom Right</summary>
+    </key>
+    <key name="slot-l" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP4'</default>
+      <summary>Left</summary>
+    </key>
+    <key name="slot-c" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP5'</default>
+      <summary>Center</summary>
+    </key>
+    <key name="slot-r" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP6'</default>
+      <summary>Right</summary>
+    </key>
+    <key name="slot-tl" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP7'</default>
+      <summary>Top Left</summary>
+    </key>
+    <key name="slot-t" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP8'</default>
+      <summary>Top</summary>
+    </key>
+    <key name="slot-tr" type="s">
+      <default>'&lt;ctrl&gt; &lt;alt&gt; KEY_KP9'</default>
+      <summary>Top Right</summary>
+    </key>
+  </schema>
+</schemalist>

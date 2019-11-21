@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.resize" path="/org/wayfire/plugin/resize/">
+    <key name="activate" type="s">
+      <default>'&lt;super&gt; BTN_RIGHT'</default>
+      <summary>Activate</summary>
+    </key>
+  </schema>
+</schemalist>

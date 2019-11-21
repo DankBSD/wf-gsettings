@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.idle" path="/org/wayfire/plugin/idle/">
+    <key name="toggle" type="s">
+      <default>'&lt;super&gt; &lt;shift&gt; KEY_I'</default>
+      <summary>Toggle</summary>
+    </key>
+    <key name="dpms-timeout" type="i">
+      <default>-1</default>
+      <summary>DPMS Timeout</summary>
+    </key>
+  </schema>
+</schemalist>

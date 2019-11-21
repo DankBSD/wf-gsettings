@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.cube" path="/org/wayfire/plugin/cube/">
+    <key name="speed-spin-horiz" type="d">
+      <default>0.01</default>
+      <summary>Horizontal Spin Speed</summary>
+    </key>
+    <key name="speed-spin-vert" type="d">
+      <default>0.01</default>
+      <summary>Vertical Spin Speed</summary>
+    </key>
+    <key name="speed-zoom" type="d">
+      <default>0.05</default>
+      <summary>Zoom Speed</summary>
+    </key>
+    <key name="zoom" type="d">
+      <default>0</default>
+      <summary>Zoom</summary>
+    </key>
+    <key name="initial-animation" type="i">
+      <default>350</default>
+      <summary>Initial Animation</summary>
+    </key>
+    <key name="background-mode" type="s">
+      <default>'simple'</default>
+      <summary>Background Mode</summary>
+    </key>
+    <key name="background" type="(dddd)">
+      <default>(0,0,0,1)</default>
+      <summary>Background Color</summary>
+    </key>
+    <key name="skydome-mirror" type="b">
+      <default>true</default>
+      <summary>Mirror Skydome</summary>
+    </key>
+    <key name="skydome-texture" type="s">
+      <default>''</default>
+      <summary>Skydome Texture</summary>
+    </key>
+    <key name="cubemap-image" type="s">
+      <default>''</default>
+      <summary>Cubemap Image</summary>
+    </key>
+    <key name="light" type="b">
+      <default>true</default>
+      <summary>Use Lighting</summary>
+    </key>
+    <key name="deform" type="i">
+      <default>0</default>
+      <summary>Deformation</summary>
+      <range min="0" max="2"/>
+    </key>
+    <key name="activate" type="s">
+      <default>'&lt;alt&gt; &lt;ctrl&gt; BTN_LEFT'</default>
+      <summary>Activate</summary>
+    </key>
+    <key name="rotate-left" type="s">
+      <default>'&lt;alt&gt; &lt;ctrl&gt; KEY_LEFT'</default>
+      <summary>Rotate Left</summary>
+    </key>
+    <key name="rotate-right" type="s">
+      <default>'&lt;alt&gt; &lt;ctrl&gt; KEY_RIGHT'</default>
+      <summary>Rotate Right</summary>
+    </key>
+  </schema>
+</schemalist>

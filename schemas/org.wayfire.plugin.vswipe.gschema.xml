@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.vswipe" path="/org/wayfire/plugin/vswipe/">
+    <key name="duration" type="i">
+      <default>180</default>
+      <summary>Duration</summary>
+    </key>
+    <key name="enable-horizontal" type="b">
+      <default>true</default>
+      <summary>Enable Horizontal</summary>
+    </key>
+    <key name="enable-vertical" type="b">
+      <default>true</default>
+      <summary>Enable Vertical</summary>
+    </key>
+    <key name="enable-smooth-transition" type="b">
+      <default>false</default>
+      <summary>Enable Smooth Transition</summary>
+    </key>
+    <key name="fingers" type="i">
+      <default>4</default>
+      <summary>Number of Fingers</summary>
+    </key>
+    <key name="gap" type="i">
+      <default>32</default>
+      <summary>Gap</summary>
+    </key>
+    <key name="threshold" type="d">
+      <default>0.35</default>
+      <summary>Threshold</summary>
+    </key>
+    <key name="delta-threshold" type="i">
+      <default>24</default>
+      <summary>Delta Threshold</summary>
+    </key>
+    <key name="speed-factor" type="i">
+      <default>256</default>
+      <summary>Speed Factor</summary>
+    </key>
+    <key name="speed-cap" type="d">
+      <default>0.05</default>
+      <summary>Speed Cap</summary>
+    </key>
+    <key name="background" type="(dddd)">
+      <default>(0.0,0.0,0.0,1.0)</default>
+      <summary>Background Color</summary>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.autorotate-iio" path="/org/wayfire/plugin/autorotate-iio/">
+    <key name="lock-rotation" type="b">
+      <default>false</default>
+      <summary>Lock Rotation</summary>
+    </key>
+    <key name="rotate-up" type="s">
+      <default>'&lt;ctrl&gt; &lt;super&gt; KEY_UP'</default>
+      <summary>Rotate Up</summary>
+    </key>
+    <key name="rotate-left" type="s">
+      <default>'&lt;ctrl&gt; &lt;super&gt; KEY_LEFT'</default>
+      <summary>Rotate Left</summary>
+    </key>
+    <key name="rotate-down" type="s">
+      <default>'&lt;ctrl&gt; &lt;super&gt; KEY_DOWN'</default>
+      <summary>Rotate Down</summary>
+    </key>
+    <key name="rotate-right" type="s">
+      <default>'&lt;ctrl&gt; &lt;super&gt; KEY_RIGHT'</default>
+      <summary>Rotate Right</summary>
+    </key>
+  </schema>
+</schemalist>

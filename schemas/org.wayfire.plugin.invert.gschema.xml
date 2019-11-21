@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.invert" path="/org/wayfire/plugin/invert/">
+    <key name="toggle" type="s">
+      <default>'&lt;super&gt; KEY_I'</default>
+      <summary>Toggle</summary>
+    </key>
+  </schema>
+</schemalist>

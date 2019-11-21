@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.core" path="/org/wayfire/plugin/core/">
+    <key name="close-top-view" type="s">
+      <default>'&lt;super&gt; KEY_Q | &lt;alt&gt; KEY_FN_F4'</default>
+      <summary>Close Window</summary>
+    </key>
+    <key name="vwidth" type="i">
+      <default>3</default>
+      <summary>Horizontal Virtual Size</summary>
+    </key>
+    <key name="vheight" type="i">
+      <default>3</default>
+      <summary>Vertical Virtual Size</summary>
+    </key>
+    <key name="background-color" type="(dddd)">
+      <default>(0.0,0.0,0.0,1.0)</default>
+      <summary>Background Color</summary>
+    </key>
+  </schema>
+</schemalist>

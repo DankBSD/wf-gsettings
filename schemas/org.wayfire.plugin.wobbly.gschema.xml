@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.wobbly" path="/org/wayfire/plugin/wobbly/">
+    <key name="friction" type="i">
+      <default>3</default>
+      <summary>Friction</summary>
+    </key>
+    <key name="spring-k" type="i">
+      <default>8</default>
+      <summary>Spring K</summary>
+    </key>
+    <key name="grid-resolution" type="i">
+      <default>6</default>
+      <summary>Grid Resolution</summary>
+    </key>
+  </schema>
+</schemalist>

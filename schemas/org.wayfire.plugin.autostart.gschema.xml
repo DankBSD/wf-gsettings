@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.plugin.autostart" path="/org/wayfire/plugin/autostart/">
+    <key name="autostart" type="as">
+      <default>[]</default>
+      <summary>Autostart</summary>
+    </key>
+  </schema>
+</schemalist>
