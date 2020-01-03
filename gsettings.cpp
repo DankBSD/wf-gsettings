@@ -3,14 +3,14 @@
 #include <gio/gio.h>
 #include <unistd.h>
 
-#include <core.hpp>
-#include <debug.hpp>
-#include <output.hpp>
-#include <plugin.hpp>
 #include <queue>
 #include <thread>
 #include <unordered_map>
-#include <util/log.hpp>
+#include <wayfire/core.hpp>
+#include <wayfire/debug.hpp>
+#include <wayfire/output.hpp>
+#include <wayfire/plugin.hpp>
+#include <wayfire/util/log.hpp>
 
 struct conf_change {
 	std::string sec;
