@@ -12,3 +12,15 @@ plugin_gsettings = shared_module('gsettings', 'gsettings.cpp',
 	dependencies: [wayfire, wlroots, gio],
 	install: true,
 	install_dir: 'lib/wayfire')
+
+script = custom_target(
+	'wf-gsettings-gen-schemas',
+	input: ['wf-gsettings-gen-schemas.in'],
+	output: ['wf-gsettings-gen-schemas'],
+	capture: true,
+	command: ['sed', '-e', 's|@PREFIX@|' + get_option('prefix') + '|', '@INPUT@'],
+	install: true,
+	install_mode: 'rwxr-xr-x',
+	install_dir: 'bin')
+
+install_data('genschema.xsl', install_dir: 'share/wf-gsettings')
