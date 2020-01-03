@@ -10,6 +10,7 @@
 #include <queue>
 #include <thread>
 #include <unordered_map>
+#include <util/log.hpp>
 
 struct conf_change {
 	std::string sec;
@@ -36,18 +37,18 @@ static void gsettings_loop(int fd) {
 	auto *gctx = g_main_context_new();
 	g_main_context_push_thread_default(gctx);
 	auto *loop = g_main_loop_new(gctx, false);
-	for (auto sec : wf::get_core().config->sections) {
-		auto schema_name = "org.wayfire.plugin." + sec->name;
+	for (auto sec : wf::get_core().config.get_all_sections()) {
+		auto schema_name = "org.wayfire.plugin." + sec->get_name();
 		if (g_settings_schema_source_lookup(g_settings_schema_source_get_default(), schema_name.c_str(),
 		                                    FALSE) == nullptr) {
-			log_info("GSettings schema not found: '%s'", schema_name.c_str());
+			LOGI("GSettings schema not found: ", schema_name.c_str());
 			continue;
 		}
 		auto *gs = g_settings_new(schema_name.c_str());
-		gsets.emplace(sec->name, gs);
-		gsets_rev.emplace(gs, sec->name);
+		gsets.emplace(sec->get_name(), gs);
+		gsets_rev.emplace(gs, sec->get_name());
 		// For future changes
-		g_signal_connect(gsets[sec->name], "changed", G_CALLBACK(gsettings_callback), (void *)fd);
+		g_signal_connect(gsets[sec->get_name()], "changed", G_CALLBACK(gsettings_callback), (void *)fd);
 		// Initial values
 		GSettingsSchema *schema = nullptr;
 		g_object_get(gs, "settings-schema", &schema, NULL);
@@ -65,11 +66,9 @@ static int handle_update(int fd, uint32_t mask, void *data);
 struct gsettings_ctx : public wf::custom_data_t {
 	std::thread loopthread;
 	int fd[2] = {0, 0};
-	wayfire_config *config = nullptr;
 	wf::wl_timer sig_debounce;
 
-	gsettings_ctx(wayfire_config *config) {
-		this->config = config;
+	gsettings_ctx() {
 		pipe(fd);
 		loopthread = std::thread(gsettings_loop, fd[1]);
 		wl_event_loop_add_fd(wf::get_core().ev_loop, fd[0], WL_EVENT_READABLE, handle_update, this);
@@ -84,24 +83,31 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 		auto chg = changes.front();
 		// GSettings does not support underscores
 		std::replace(chg.key.begin(), chg.key.end(), '-', '_');
-		auto opt = ctx->config->get_section(chg.sec)->get_option(chg.key, "");
-		const auto *typ = g_variant_get_type(chg.val);
-		if (g_variant_type_equal(typ, G_VARIANT_TYPE_STRING)) {
-			opt->set_value(std::string(g_variant_get_string(chg.val, NULL)));
-		} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_BOOLEAN)) {
-			opt->set_value(g_variant_get_boolean(chg.val));
-		} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_INT32)) {
-			opt->set_value(g_variant_get_int32(chg.val));
-		} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_DOUBLE)) {
-			opt->set_value(static_cast<float>(g_variant_get_double(chg.val)));
-		} else if (g_variant_type_equal(typ, G_VARIANT_TYPE("(dddd)"))) {
-			opt->set_value(wf_color{
-			    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 0))),
-			    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 1))),
-			    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 2))),
-			    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 3)))});
-		} else {
-			log_info("GSettings update %s.%s has unsupported type", chg.sec.c_str(), chg.key.c_str());
+		try {
+			auto opt = wf::get_core().config.get_section(chg.sec)->get_option(chg.key);
+			const auto *typ = g_variant_get_type(chg.val);
+			if (g_variant_type_equal(typ, G_VARIANT_TYPE_STRING)) {
+				opt->set_value_str(std::string(g_variant_get_string(chg.val, NULL)));
+			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_BOOLEAN)) {
+				std::dynamic_pointer_cast<wf::config::option_t<bool>>(opt)->set_value(
+				    g_variant_get_boolean(chg.val));
+			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_INT32)) {
+				// if (chg.sec != "vswitch" || chg.key != "duration")
+				std::dynamic_pointer_cast<wf::config::option_t<int>>(opt)->set_value(
+				    g_variant_get_int32(chg.val));
+			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_DOUBLE)) {
+				std::dynamic_pointer_cast<wf::config::option_t<double>>(opt)->set_value(
+				    static_cast<float>(g_variant_get_double(chg.val)));
+			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE("(dddd)"))) {
+				std::dynamic_pointer_cast<wf::config::option_t<wf::color_t>>(opt)->set_value(wf::color_t{
+				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 0))),
+				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 1))),
+				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 2))),
+				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 3)))});
+			} else {
+				LOGI("GSettings update has unsupported type: ", chg.sec.c_str(), "/", chg.key.c_str());
+			}
+		} catch (std::invalid_argument &e) {
 		}
 		g_variant_unref(chg.val);
 		changes.pop();
@@ -110,9 +116,9 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 	// Firing it per value e.g. when initially applying everything is a bad idea
 	// TODO: if possible, add more efficient way to wayfire, without readding source
 	ctx->sig_debounce.disconnect();
-	ctx->sig_debounce.set_timeout(69, [] () {
+	ctx->sig_debounce.set_timeout(69, []() {
 		wf::get_core().emit_signal("reload-config", nullptr);
-		log_info("GSettings applied");
+		LOGI("GSettings applied");
 	});
 	write(fd, "!", 1);
 	return 1;
@@ -120,9 +126,9 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 
 // Plugins are per-output, this wrapper/data thing is for output independence
 struct wayfire_gsettings : public wf::plugin_interface_t {
-	void init(wayfire_config *config) override {
+	void init() override {
 		if (!wf::get_core().has_data<gsettings_ctx>()) {
-			wf::get_core().store_data(std::make_unique<gsettings_ctx>(config));
+			wf::get_core().store_data(std::make_unique<gsettings_ctx>());
 		}
 	}
 
