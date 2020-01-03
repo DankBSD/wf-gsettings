@@ -1,5 +1,5 @@
 #!/bin/sh
-: ${PREFIX:="/usr/local"}
+: ${PREFIX:="@PREFIX@"}
 for p in $(ls "$PREFIX/share/wayfire/metadata"); do
 	xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.plugin.${p%.xml}.gschema.xml" \
 		"$PREFIX/share/wf-gsettings/genschema.xsl" \
