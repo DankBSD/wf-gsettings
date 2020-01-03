@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<schemalist>
-  <schema id="org.wayfire.plugin.place" path="/org/wayfire/plugin/place/">
-    <key name="mode" type="s">
-      <default>'center'</default>
-      <summary>Window Placement Mode</summary>
-    </key>
-  </schema>
-</schemalist>

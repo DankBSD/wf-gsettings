@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<schemalist>
-  <schema id="org.wayfire.plugin.fast-switcher" path="/org/wayfire/plugin/fast-switcher/">
-    <key name="activate" type="s">
-      <default>'&lt;alt&gt; KEY_TAB'</default>
-      <summary>Activate</summary>
-    </key>
-  </schema>
-</schemalist>

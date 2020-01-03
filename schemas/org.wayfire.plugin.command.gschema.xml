@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<schemalist>
-  <schema id="org.wayfire.plugin.command" path="/org/wayfire/plugin/command/">
-    <key name="command" type="as">
-      <default>[]</default>
-      <summary>Command</summary>
-    </key>
-  </schema>
-</schemalist>

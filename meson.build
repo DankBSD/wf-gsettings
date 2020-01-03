@@ -6,8 +6,6 @@ wlroots = dependency('wlroots', fallback: ['wlroots', 'wlroots'])
 gio = dependency('gio-2.0')
 gnome = import('gnome')
 
-subdir('schemas')
-
 plugin_gsettings = shared_module('gsettings', 'gsettings.cpp',
 	dependencies: [wayfire, wlroots, gio],
 	install: true,
