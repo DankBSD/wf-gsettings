@@ -92,7 +92,6 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 				std::dynamic_pointer_cast<wf::config::option_t<bool>>(opt)->set_value(
 				    g_variant_get_boolean(chg.val));
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_INT32)) {
-				// if (chg.sec != "vswitch" || chg.key != "duration")
 				std::dynamic_pointer_cast<wf::config::option_t<int>>(opt)->set_value(
 				    g_variant_get_int32(chg.val));
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_DOUBLE)) {
@@ -108,6 +107,7 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 				LOGI("GSettings update has unsupported type: ", chg.sec.c_str(), "/", chg.key.c_str());
 			}
 		} catch (std::invalid_argument &e) {
+			LOGE("GSettings update could not apply: ", chg.sec.c_str(), "/", chg.key.c_str());
 		}
 		g_variant_unref(chg.val);
 		changes.pop();
