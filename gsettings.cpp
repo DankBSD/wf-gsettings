@@ -86,23 +86,42 @@ static int handle_update(int fd, uint32_t mask, void *data) {
 		try {
 			auto opt = wf::get_core().config.get_section(chg.sec)->get_option(chg.key);
 			const auto *typ = g_variant_get_type(chg.val);
-			if (g_variant_type_equal(typ, G_VARIANT_TYPE_STRING)) {
+			if (opt == nullptr) {
+				LOGI("GSettings update found nullptr opt: ", chg.sec.c_str(), "/", chg.key.c_str());
+			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_STRING)) {
 				opt->set_value_str(std::string(g_variant_get_string(chg.val, NULL)));
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_BOOLEAN)) {
-				std::dynamic_pointer_cast<wf::config::option_t<bool>>(opt)->set_value(
-				    g_variant_get_boolean(chg.val));
+				auto topt = std::dynamic_pointer_cast<wf::config::option_t<bool>>(opt);
+				if (topt == nullptr) {
+					LOGW("GSettings update could not cast opt to bool: ", chg.sec.c_str(), "/", chg.key.c_str());
+				} else {
+					topt->set_value(g_variant_get_boolean(chg.val));
+				}
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_INT32)) {
-				std::dynamic_pointer_cast<wf::config::option_t<int>>(opt)->set_value(
-				    g_variant_get_int32(chg.val));
+				auto topt = std::dynamic_pointer_cast<wf::config::option_t<int>>(opt);
+				if (topt == nullptr) {
+					LOGW("GSettings update could not cast opt to int: ", chg.sec.c_str(), "/", chg.key.c_str());
+				} else {
+					topt->set_value(g_variant_get_int32(chg.val));
+				}
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE_DOUBLE)) {
-				std::dynamic_pointer_cast<wf::config::option_t<double>>(opt)->set_value(
-				    static_cast<float>(g_variant_get_double(chg.val)));
+				auto topt = std::dynamic_pointer_cast<wf::config::option_t<double>>(opt);
+				if (topt == nullptr) {
+					LOGW("GSettings update could not cast opt to double: ", chg.sec.c_str(), "/", chg.key.c_str());
+				} else {
+					topt->set_value(static_cast<float>(g_variant_get_double(chg.val)));
+				}
 			} else if (g_variant_type_equal(typ, G_VARIANT_TYPE("(dddd)"))) {
-				std::dynamic_pointer_cast<wf::config::option_t<wf::color_t>>(opt)->set_value(wf::color_t{
-				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 0))),
-				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 1))),
-				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 2))),
-				    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 3)))});
+				auto topt = std::dynamic_pointer_cast<wf::config::option_t<wf::color_t>>(opt);
+				if (topt == nullptr) {
+					LOGW("GSettings update could not cast opt to color: ", chg.sec.c_str(), "/", chg.key.c_str());
+				} else {
+					topt->set_value(wf::color_t{
+					    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 0))),
+					    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 1))),
+					    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 2))),
+					    static_cast<float>(g_variant_get_double(g_variant_get_child_value(chg.val, 3)))});
+				}
 			} else {
 				LOGI("GSettings update has unsupported type: ", chg.sec.c_str(), "/", chg.key.c_str());
 			}
