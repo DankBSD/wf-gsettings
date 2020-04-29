@@ -1,8 +1,18 @@
 #!/bin/sh
 : ${PREFIX:="@PREFIX@"}
 for p in $(ls "$PREFIX/share/wayfire/metadata"); do
-	xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.plugin.${p%.xml}.gschema.xml" \
-		"$PREFIX/share/wf-gsettings/genschema.xsl" \
-		"$PREFIX/share/wayfire/metadata/$p"
+if [[ -f "$PREFIX/share/wayfire/metadata/$p" ]]
+then
+        xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.plugin.${p%.xml}.gschema.xml" \
+                "$PREFIX/share/wf-gsettings/genschema.xsl" \
+                "$PREFIX/share/wayfire/metadata/$p"
+else #for subdirecories like wf-shell/{panel.xml,dock.xml etc..}
+        for i in $(ls "$PREFIX/share/wayfire/metadata/$p"); do
+        xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.plugin.$p.${i%.xml}.gschema.xml" \
+                "$PREFIX/share/wf-gsettings/genschema.xsl" \
+                "$PREFIX/share/wayfire/metadata/$p/$i"
+        done
+fi
 done
 glib-compile-schemas "$PREFIX/share/glib-2.0/schemas"
+
