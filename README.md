@@ -1,6 +1,9 @@
 # wf-gsettings
 
-GSettings plugin for [Wayfire].
+The main goal is to have a wayfire config backend that uses gsettings
+or fork wayfire to use gsettings.
+
+Meanwhile this is the gsettings plugin for [Wayfire].
 
 - install latest Wayfire, GLib, `xsltproc` (from `libxslt`)
 - install this (regular Meson build)
@@ -15,9 +18,3 @@ GSettings plugin for [Wayfire].
 
 [Wayfire]: https://github.com/WayfireWM/wayfire
 [dconf-editor]: https://wiki.gnome.org/Apps/DconfEditor
-[numbernine]: https://github.com/myfreeweb/numbernine
-
-## License
-
-This is free and unencumbered software released into the public domain.  
-For more information, please refer to the `UNLICENSE` file or [unlicense.org](http://unlicense.org).
