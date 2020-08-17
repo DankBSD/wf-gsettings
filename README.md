@@ -1,4 +1,7 @@
-# wf-gsettings
+# wayfire-plugin_gsettings
+
+The work is based on the wf-gsettings plugin,
+this is a complete 'fork' though.
 
 The main goal is to have a wayfire config backend that uses gsettings
 or fork wayfire to use gsettings.
