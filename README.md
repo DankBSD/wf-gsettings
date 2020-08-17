@@ -14,7 +14,7 @@ Meanwhile this is the gsettings plugin for [Wayfire].
 		- schemas are named `org.wayfire.plugin.<name>`
 	- and runs `glib-compile-schemas` for you
 - add `gsettings` to the plugin list in Wayfire config
-- start Wayfire, play around with [dconf-editor], [numbernine]'s settings app, etc
+- start Wayfire, play around with [dconf-editor]
 
 [Wayfire]: https://github.com/WayfireWM/wayfire
 [dconf-editor]: https://wiki.gnome.org/Apps/DconfEditor
