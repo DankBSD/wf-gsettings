@@ -1,4 +1,4 @@
-project('wf-gsettings', ['cpp'], version: '0.0.1', license: 'Unlicense',
+project('wayfire-plugin_gsettings', ['cpp'], version: '0.0.1', license: 'Unlicense',
 	default_options: ['cpp_std=c++17', 'warning_level=2'])
 
 wayfire = dependency('wayfire')
@@ -21,4 +21,4 @@ script = custom_target(
 	install_mode: 'rwxr-xr-x',
 	install_dir: 'bin')
 
-install_data('genschema.xsl', install_dir: 'share/wf-gsettings')
+install_data('genschema.xsl', install_dir: 'share/wayfire-plugin_gsettings')
