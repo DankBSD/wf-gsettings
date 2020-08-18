@@ -9,7 +9,7 @@ gnome = import('gnome')
 plugin_gsettings = shared_module('gsettings', 'gsettings.cpp',
 	dependencies: [wayfire, wlroots, gio],
 	install: true,
-	install_dir: 'lib/wayfire')
+	install_dir: wayfire.get_variable(pkgconfig: 'metadatadir'))
 
 script = custom_target(
 	'wf-gsettings-gen-schemas',
