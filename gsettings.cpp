@@ -21,14 +21,97 @@ struct conf_change {
 static std::unordered_map<std::string, GSettings *> gsets;
 static std::unordered_map<GSettings *, std::string> gsets_rev;
 static std::queue<conf_change> changes;
+static bool is_updating = false;
+
+static void gsettings_update_schemas(int fd);
 
 static void gsettings_callback(GSettings *settings, gchar *key, gpointer user_data) {
-	changes.push(
-	    conf_change{gsets_rev[settings], std::string(key), g_settings_get_value(settings, key)});
 	int fd = (int)(intptr_t)user_data;
+	std::string skey(key);
+	if (skey == "wfgs-dyn-objs-internal-magic-list") {
+		size_t lstlen = 0;
+		const gchar **lst = g_variant_get_strv(g_settings_get_value(settings, key), &lstlen);
+		for (size_t i = 0; i < lstlen; i++) {
+			std::string subsec(
+			    lst[i]);  // e.g. 'output:eDP-1' - that's the member of wfgs-dyn-objs-internal-magic-list
+			auto sec = gsets_rev[settings] + "." + subsec;  // e.g. 'core.output:eDP-1'
+			if (!wf::get_core().config.get_section(sec)) {
+				LOGI("Adding dynamic section ", sec);
+				size_t splitter = sec.find_first_of(":");
+				auto obj_type_name = sec.substr(0, splitter);  // e.g. 'core.output'
+				auto parent_section = wf::get_core().config.get_section(obj_type_name);
+				if (!parent_section) {
+					LOGE("No parent section ", obj_type_name, " for relocatable ", sec);
+					continue;
+				}
+				wf::get_core().config.merge_section(parent_section->clone_with_name(sec));
+			}
+		}
+		g_free(lst);
+		if (!is_updating) gsettings_update_schemas(fd);
+	} else {
+		changes.push(conf_change{gsets_rev[settings], skey, g_settings_get_value(settings, key)});
+	}
 	write(fd, "!", 1);
 	char buff;
 	read(fd, &buff, 1);
+}
+
+static void gsettings_update_schemas(int fd) {
+	is_updating = true;
+	for (auto sec : wf::get_core().config.get_all_sections()) {
+		std::optional<std::string> reloc_path;
+		auto sec_name = sec->get_name();
+		if (gsets.count(sec_name) != 0) {
+			LOGI("Skipping existing ", sec_name);
+			continue;
+		}
+		auto schema_name = "org.wayfire.plugin." + sec_name;
+		size_t splitter = sec_name.find_first_of(":");
+		if (splitter != std::string::npos) {
+			auto obj_type_name = sec_name.substr(0, splitter);  // e.g. 'core.output'
+			auto section_name = sec_name.substr(splitter + 1);
+			if (!obj_type_name.empty() && !section_name.empty()) {
+				schema_name = "org.wayfire.plugin." + obj_type_name;
+				std::replace(obj_type_name.begin(), obj_type_name.end(), '.', '/');
+				reloc_path = "/org/wayfire/plugin/" + obj_type_name + "/" + section_name + "/";
+			}
+		}
+		GSettingsSchema *schema = g_settings_schema_source_lookup(
+		    g_settings_schema_source_get_default(), schema_name.c_str(), FALSE);
+		if (!schema) {
+			LOGI("GSettings schema not found: ", schema_name.c_str(), " ",
+			     reloc_path ? reloc_path->c_str() : "");
+			continue;
+		}
+		auto is_reloc = g_settings_schema_get_path(schema) == nullptr;
+		if (!reloc_path && is_reloc) {
+			g_settings_schema_unref(schema);
+			continue;
+		}
+		GSettings *gs = nullptr;
+		if (reloc_path)
+			gs = g_settings_new_with_path(schema_name.c_str(), reloc_path->c_str());
+		else
+			gs = g_settings_new(schema_name.c_str());
+		if (!gs) {
+			LOGI("GSettings object not found: ", schema_name.c_str(), " ",
+			     reloc_path ? reloc_path->c_str() : "");
+			g_settings_schema_unref(schema);
+			continue;
+		}
+		gsets.emplace(sec_name, gs);
+		gsets_rev.emplace(gs, sec_name);
+		// For future changes
+		g_signal_connect(gsets[sec_name], "changed", G_CALLBACK(gsettings_callback), (void *)fd);
+		// Initial values
+		gchar **keys = g_settings_schema_list_keys(schema);
+		while (*keys != nullptr) {
+			gsettings_callback(gs, *keys++, (void *)fd);
+		}
+		g_settings_schema_unref(schema);
+	}
+	is_updating = false;
 }
 
 static void gsettings_loop(int fd) {
@@ -37,27 +120,8 @@ static void gsettings_loop(int fd) {
 	auto *gctx = g_main_context_new();
 	g_main_context_push_thread_default(gctx);
 	auto *loop = g_main_loop_new(gctx, false);
-	for (auto sec : wf::get_core().config.get_all_sections()) {
-		auto schema_name = "org.wayfire.plugin." + sec->get_name();
-		if (g_settings_schema_source_lookup(g_settings_schema_source_get_default(), schema_name.c_str(),
-		                                    FALSE) == nullptr) {
-			LOGI("GSettings schema not found: ", schema_name.c_str());
-			continue;
-		}
-		auto *gs = g_settings_new(schema_name.c_str());
-		gsets.emplace(sec->get_name(), gs);
-		gsets_rev.emplace(gs, sec->get_name());
-		// For future changes
-		g_signal_connect(gsets[sec->get_name()], "changed", G_CALLBACK(gsettings_callback), (void *)fd);
-		// Initial values
-		GSettingsSchema *schema = nullptr;
-		g_object_get(gs, "settings-schema", &schema, NULL);
-		gchar **keys = g_settings_schema_list_keys(schema);
-		while (*keys != nullptr) {
-			gsettings_callback(gs, *keys++, (void *)fd);
-		}
-		g_settings_schema_unref(schema);
-	}
+	gsettings_update_schemas(fd);
+	gsettings_update_schemas(fd);  // call twice in case newly added relocatables were not processed
 	g_main_loop_run(loop);
 }
 
