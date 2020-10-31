@@ -1,7 +1,7 @@
 #!/bin/sh
 : ${PREFIX:="@PREFIX@"}
 for p in $(ls "$PREFIX/share/wayfire/metadata"); do
-	xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.plugin.${p%.xml}.gschema.xml" \
+	xsltproc -o "$PREFIX/share/glib-2.0/schemas/org.wayfire.section.${p%.xml}.gschema.xml" \
 		"$PREFIX/share/wf-gsettings/genschema.xsl" \
 		"$PREFIX/share/wayfire/metadata/$p"
 done

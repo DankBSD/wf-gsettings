@@ -40,15 +40,15 @@ static void gsettings_update_schemas(int fd) {
 			LOGD("Skipping existing section ", sec_name);
 			continue;
 		}
-		auto schema_name = "org.wayfire.plugin." + sec_name;
+		auto schema_name = "org.wayfire.section." + sec_name;
 		size_t splitter = sec_name.find_first_of(":");
 		if (splitter != std::string::npos) {
 			auto obj_type_name = sec_name.substr(0, splitter);  // e.g. 'core.output'
 			auto section_name = sec_name.substr(splitter + 1);
 			if (!obj_type_name.empty() && !section_name.empty()) {
-				schema_name = "org.wayfire.plugin." + obj_type_name;
+				schema_name = "org.wayfire.section." + obj_type_name;
 				std::replace(obj_type_name.begin(), obj_type_name.end(), '.', '/');
-				reloc_path = "/org/wayfire/plugin/" + obj_type_name + "/" + section_name + "/";
+				reloc_path = "/org/wayfire/section/" + obj_type_name + "/" + section_name + "/";
 				LOGD("Adding section ", sec_name, " relocatable schema ", schema_name, " at path ",
 				     *reloc_path);
 			} else {

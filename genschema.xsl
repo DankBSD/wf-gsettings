@@ -10,14 +10,14 @@
 	</xsl:template>
 
 	<xsl:template match="plugin">
-		<schema id="org.wayfire.plugin.{@name}"
-			path="/org/wayfire/plugin/{@name}/">
+		<schema id="org.wayfire.section.{@name}"
+			path="/org/wayfire/section/{@name}/">
 			<xsl:apply-templates select="option|group"/>
 		</schema>
 	</xsl:template>
 
 	<xsl:template match="object">
-		<schema id="org.wayfire.plugin.{@name}">
+		<schema id="org.wayfire.section.{@name}">
 			<xsl:apply-templates select="option|group"/>
 		</schema>
 	</xsl:template>
