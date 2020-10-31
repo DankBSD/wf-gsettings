@@ -21,44 +21,17 @@ struct conf_change {
 static std::unordered_map<std::string, GSettings *> gsets;
 static std::unordered_map<GSettings *, std::string> gsets_rev;
 static std::queue<conf_change> changes;
-static bool is_updating = false;
-
-static void gsettings_update_schemas(int fd);
 
 static void gsettings_callback(GSettings *settings, gchar *key, gpointer user_data) {
 	int fd = (int)(intptr_t)user_data;
 	std::string skey(key);
-	if (skey == "wfgs-dyn-objs-internal-magic-list") {
-		size_t lstlen = 0;
-		const gchar **lst = g_variant_get_strv(g_settings_get_value(settings, key), &lstlen);
-		for (size_t i = 0; i < lstlen; i++) {
-			std::string subsec(
-			    lst[i]);  // e.g. 'output:eDP-1' - that's the member of wfgs-dyn-objs-internal-magic-list
-			auto sec = gsets_rev[settings] + "." + subsec;  // e.g. 'core.output:eDP-1'
-			if (!wf::get_core().config.get_section(sec)) {
-				LOGI("Adding dynamic section ", sec);
-				size_t splitter = sec.find_first_of(":");
-				auto obj_type_name = sec.substr(0, splitter);  // e.g. 'core.output'
-				auto parent_section = wf::get_core().config.get_section(obj_type_name);
-				if (!parent_section) {
-					LOGE("No parent section ", obj_type_name, " for relocatable ", sec);
-					continue;
-				}
-				wf::get_core().config.merge_section(parent_section->clone_with_name(sec));
-			}
-		}
-		g_free(lst);
-		if (!is_updating) gsettings_update_schemas(fd);
-	} else {
-		changes.push(conf_change{gsets_rev[settings], skey, g_settings_get_value(settings, key)});
-	}
+	changes.push(conf_change{gsets_rev[settings], skey, g_settings_get_value(settings, key)});
 	write(fd, "!", 1);
 	char buff;
 	read(fd, &buff, 1);
 }
 
 static void gsettings_update_schemas(int fd) {
-	is_updating = true;
 	for (auto sec : wf::get_core().config.get_all_sections()) {
 		std::optional<std::string> reloc_path;
 		auto sec_name = sec->get_name();
@@ -111,7 +84,31 @@ static void gsettings_update_schemas(int fd) {
 		}
 		g_settings_schema_unref(schema);
 	}
-	is_updating = false;
+}
+
+static void gsettings_meta_callback(GSettings *settings, gchar *key, gpointer user_data) {
+	int fd = (int)(intptr_t)user_data;
+	std::string skey(key);
+	if (skey == "dyn-sections") {
+		size_t lstlen = 0;
+		const gchar **lst = g_variant_get_strv(g_settings_get_value(settings, key), &lstlen);
+		for (size_t i = 0; i < lstlen; i++) {
+			std::string sec(lst[i]);  // e.g. 'core.output:eDP-1' - member of dyn-sections
+			if (!wf::get_core().config.get_section(sec)) {
+				LOGI("Adding dynamic section ", sec);
+				size_t splitter = sec.find_first_of(":");
+				auto obj_type_name = sec.substr(0, splitter);  // e.g. 'core.output'
+				auto parent_section = wf::get_core().config.get_section(obj_type_name);
+				if (!parent_section) {
+					LOGE("No parent section ", obj_type_name, " for relocatable ", sec);
+					continue;
+				}
+				wf::get_core().config.merge_section(parent_section->clone_with_name(sec));
+			}
+		}
+		g_free(lst);
+		gsettings_update_schemas(fd);
+	}
 }
 
 static void gsettings_loop(int fd) {
@@ -120,8 +117,21 @@ static void gsettings_loop(int fd) {
 	auto *gctx = g_main_context_new();
 	g_main_context_push_thread_default(gctx);
 	auto *loop = g_main_loop_new(gctx, false);
+	GSettings *mgs = g_settings_new("org.wayfire.gsettings");
+	if (!mgs) {
+		LOGE("GSettings object org.wayfire.gsettings not found - relocatable functionality lost!");
+	} else {
+		// For future changes
+		g_signal_connect(mgs, "changed", G_CALLBACK(gsettings_meta_callback), (void *)fd);
+		// Initial values
+		GSettingsSchema *schema = nullptr;
+		g_object_get(mgs, "settings-schema", &schema, NULL);
+		gchar **keys = g_settings_schema_list_keys(schema);
+		while (*keys != nullptr) {
+			gsettings_meta_callback(mgs, *keys++, (void *)fd);
+		}
+	}
 	gsettings_update_schemas(fd);
-	gsettings_update_schemas(fd);  // call twice in case newly added relocatables were not processed
 	g_main_loop_run(loop);
 }
 

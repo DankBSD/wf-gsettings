@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schemalist>
+  <schema id="org.wayfire.gsettings" path="/org/wayfire/gsettings/">
+		<key name="dyn-sections" type="as">
+			<default>[]</default>
+			<summary>List of config sections that exist as relocatable instances in GSettings</summary>
+		</key>
+  </schema>
+</schemalist>

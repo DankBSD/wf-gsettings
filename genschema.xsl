@@ -13,10 +13,6 @@
 		<schema id="org.wayfire.plugin.{@name}"
 			path="/org/wayfire/plugin/{@name}/">
 			<xsl:apply-templates select="option|group"/>
-			<key name="wfgs-dyn-objs-internal-magic-list" type="as">
-				<default>[]</default>
-				<summary>List of config sections (under this one) that exist for dynamic (relocatable) objects</summary>
-			</key>
 		</schema>
 	</xsl:template>
 
