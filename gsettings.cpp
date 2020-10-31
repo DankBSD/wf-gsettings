@@ -84,11 +84,12 @@ static void gsettings_update_schemas(int fd) {
 		gsets.emplace(sec_name, gs);
 		gsets_rev.emplace(gs, sec_name);
 		// For future changes
-		g_signal_connect(gsets[sec_name], "changed", G_CALLBACK(gsettings_callback), (void *)fd);
+		g_signal_connect(gsets[sec_name], "changed", G_CALLBACK(gsettings_callback),
+		                 (void *)(uintptr_t)fd);
 		// Initial values
 		gchar **keys = g_settings_schema_list_keys(schema);
 		while (*keys != nullptr) {
-			gsettings_callback(gs, *keys++, (void *)fd);
+			gsettings_callback(gs, *keys++, (void *)(uintptr_t)fd);
 		}
 		g_settings_schema_unref(schema);
 	}
@@ -131,20 +132,20 @@ static void gsettings_loop(int fd) {
 		LOGE("GSettings object org.wayfire.gsettings not found - relocatable functionality lost!");
 	} else {
 		// For future changes
-		g_signal_connect(mgs, "changed", G_CALLBACK(gsettings_meta_callback), (void *)fd);
+		g_signal_connect(mgs, "changed", G_CALLBACK(gsettings_meta_callback), (void *)(uintptr_t)fd);
 		// Initial values
 		GSettingsSchema *schema = nullptr;
 		g_object_get(mgs, "settings-schema", &schema, NULL);
 		gchar **keys = g_settings_schema_list_keys(schema);
 		while (*keys != nullptr) {
-			gsettings_meta_callback(mgs, *keys++, (void *)fd);
+			gsettings_meta_callback(mgs, *keys++, (void *)(uintptr_t)fd);
 		}
 	}
 	gsettings_update_schemas(fd);
 	g_main_loop_run(loop);
 }
 
-static int handle_update(int fd, uint32_t mask, void *data);
+static int handle_update(int fd, uint32_t /* mask */, void *data);
 
 struct gsettings_ctx : public wf::custom_data_t {
 	std::thread loopthread;
@@ -158,7 +159,7 @@ struct gsettings_ctx : public wf::custom_data_t {
 	}
 };
 
-static int handle_update(int fd, uint32_t mask, void *data) {
+static int handle_update(int fd, uint32_t /* mask */, void *data) {
 	auto *ctx = reinterpret_cast<gsettings_ctx *>(data);
 	char buff;
 	read(fd, &buff, 1);
