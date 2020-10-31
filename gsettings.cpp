@@ -32,11 +32,12 @@ static void gsettings_callback(GSettings *settings, gchar *key, gpointer user_da
 }
 
 static void gsettings_update_schemas(int fd) {
+	LOGD("Updating schemas");
 	for (auto sec : wf::get_core().config.get_all_sections()) {
 		std::optional<std::string> reloc_path;
 		auto sec_name = sec->get_name();
 		if (gsets.count(sec_name) != 0) {
-			LOGI("Skipping existing ", sec_name);
+			LOGD("Skipping existing section ", sec_name);
 			continue;
 		}
 		auto schema_name = "org.wayfire.plugin." + sec_name;
@@ -48,12 +49,19 @@ static void gsettings_update_schemas(int fd) {
 				schema_name = "org.wayfire.plugin." + obj_type_name;
 				std::replace(obj_type_name.begin(), obj_type_name.end(), '.', '/');
 				reloc_path = "/org/wayfire/plugin/" + obj_type_name + "/" + section_name + "/";
+				LOGD("Adding section ", sec_name, " relocatable schema ", schema_name, " at path ",
+				     *reloc_path);
+			} else {
+				LOGD("Adding section ", sec_name,
+				     " has ':' but could not split name, continuing as fixed schema ", schema_name);
 			}
+		} else {
+			LOGD("Adding section ", sec_name, " fixed schema ", schema_name);
 		}
 		GSettingsSchema *schema = g_settings_schema_source_lookup(
 		    g_settings_schema_source_get_default(), schema_name.c_str(), FALSE);
 		if (!schema) {
-			LOGI("GSettings schema not found: ", schema_name.c_str(), " ",
+			LOGE("GSettings schema not found: ", schema_name.c_str(), " ",
 			     reloc_path ? reloc_path->c_str() : "");
 			continue;
 		}
@@ -68,7 +76,7 @@ static void gsettings_update_schemas(int fd) {
 		else
 			gs = g_settings_new(schema_name.c_str());
 		if (!gs) {
-			LOGI("GSettings object not found: ", schema_name.c_str(), " ",
+			LOGE("GSettings object not found: ", schema_name.c_str(), " ",
 			     reloc_path ? reloc_path->c_str() : "");
 			g_settings_schema_unref(schema);
 			continue;
@@ -90,6 +98,7 @@ static void gsettings_meta_callback(GSettings *settings, gchar *key, gpointer us
 	int fd = (int)(intptr_t)user_data;
 	std::string skey(key);
 	if (skey == "dyn-sections") {
+		LOGD("Updating dynamic sections");
 		size_t lstlen = 0;
 		const gchar **lst = g_variant_get_strv(g_settings_get_value(settings, key), &lstlen);
 		for (size_t i = 0; i < lstlen; i++) {
