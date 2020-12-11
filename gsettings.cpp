@@ -58,7 +58,7 @@ static void gsettings_update_schemas(int fd) {
 		} else {
 			LOGD("Adding section ", sec_name, " fixed schema ", schema_name);
 		}
-		GSettingsSchema *schema = g_settings_schema_source_lookup(
+		g_autoptr(GSettingsSchema) schema = g_settings_schema_source_lookup(
 		    g_settings_schema_source_get_default(), schema_name.c_str(), FALSE);
 		if (!schema) {
 			LOGE("GSettings schema not found: ", schema_name.c_str(), " ",
@@ -67,7 +67,6 @@ static void gsettings_update_schemas(int fd) {
 		}
 		auto is_reloc = g_settings_schema_get_path(schema) == nullptr;
 		if (!reloc_path && is_reloc) {
-			g_settings_schema_unref(schema);
 			continue;
 		}
 		GSettings *gs = nullptr;
@@ -78,7 +77,6 @@ static void gsettings_update_schemas(int fd) {
 		if (!gs) {
 			LOGE("GSettings object not found: ", schema_name.c_str(), " ",
 			     reloc_path ? reloc_path->c_str() : "");
-			g_settings_schema_unref(schema);
 			continue;
 		}
 		gsets.emplace(sec_name, gs);
@@ -91,7 +89,6 @@ static void gsettings_update_schemas(int fd) {
 		while (*keys != nullptr) {
 			gsettings_callback(gs, *keys++, (void *)(uintptr_t)fd);
 		}
-		g_settings_schema_unref(schema);
 	}
 }
 
@@ -134,7 +131,7 @@ static void gsettings_loop(int fd) {
 		// For future changes
 		g_signal_connect(mgs, "changed", G_CALLBACK(gsettings_meta_callback), (void *)(uintptr_t)fd);
 		// Initial values
-		GSettingsSchema *schema = nullptr;
+		g_autoptr(GSettingsSchema) schema = nullptr;
 		g_object_get(mgs, "settings-schema", &schema, NULL);
 		gchar **keys = g_settings_schema_list_keys(schema);
 		while (*keys != nullptr) {
