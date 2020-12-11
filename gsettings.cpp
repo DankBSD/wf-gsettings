@@ -59,7 +59,7 @@ static void gsettings_update_schemas(int fd) {
 			LOGD("Adding section ", sec_name, " fixed schema ", schema_name);
 		}
 		g_autoptr(GSettingsSchema) schema = g_settings_schema_source_lookup(
-		    g_settings_schema_source_get_default(), schema_name.c_str(), FALSE);
+		    g_settings_schema_source_get_default(), schema_name.c_str(), TRUE);
 		if (!schema) {
 			LOGE("GSettings schema not found: ", schema_name.c_str(), " ",
 			     reloc_path ? reloc_path->c_str() : "");
